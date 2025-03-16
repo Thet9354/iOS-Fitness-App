@@ -15,6 +15,24 @@ extension Date {
         let calendar = Calendar.current
         return calendar.startOfDay(for: Date()) // return the start of the current day
     }
+    
+    static var startOfWeek: Date {
+        let calendar = Calendar.current
+        var components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())
+        components.weekday = 2
+        return calendar.date(from: components) ?? Date()
+    }
+}
+
+extension Double {
+    
+    func formattedNumberString() -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 0
+        
+        return formatter.string(from: NSNumber(value: self)) ?? "0"
+    }
 }
 
 /// Singleton class to manage HealthKit-related functionalities
@@ -42,8 +60,10 @@ class HealthManager {
         let calories = HKQuantityType(.activeEnergyBurned)
         let exercise = HKQuantityType(.appleExerciseTime)
         let stand = HKCategoryType(.appleStandHour)
+        let steps = HKQuantityType(.stepCount)
+        let workouts = HKSampleType.workoutType()
         
-        let healthType: Set = [calories, exercise, stand]
+        let healthType: Set = [calories, exercise, stand, steps, workouts]
         try await healthStore.requestAuthorization(toShare: [], read: healthType)
 
     }
@@ -128,5 +148,104 @@ class HealthManager {
         }
         
         healthStore.execute(query)
+    }
+    
+    // MARK: Fitness Activity
+    func fetchTodaySteps(completion: @escaping (Result<Activity, Error>) -> Void) {
+        let steps = HKQuantityType(.stepCount)
+        
+        // Ensure the start and end times cover the full day
+        let startOfDay = Calendar.current.startOfDay(for: Date())
+        let endOfDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
+        
+        let predicate = HKQuery.predicateForSamples(withStart: startOfDay, end: endOfDay)
+        
+        let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate) { _, results, error in
+            if let error = error {
+                print("❌ HealthKit Query Error: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+            
+            guard let quantity = results?.sumQuantity() else {
+                print("⚠️ No step data found for today.")
+                let defaultActivity = Activity(
+                    title: "Today Steps",
+                    subtitle: "Goal: 800",
+                    image: "figure.walk",
+                    tintColor: .gray, // Indicate no data with gray color
+                    amount: "0" // Default to zero if no data is available
+                )
+                completion(.success(defaultActivity))
+                return
+            }
+            
+            let stepsCount = quantity.doubleValue(for: .count())
+            print("✅ Steps counted today: \(stepsCount)")
+            
+            let activity = Activity(
+                title: "Today Steps",
+                subtitle: "Goal: 800",
+                image: "figure.walk",
+                tintColor: .green,
+                amount: stepsCount.formattedNumberString()
+            )
+            
+            completion(.success(activity))
+        }
+        
+        healthStore.execute(query)
+    }
+
+    
+    func fetchCurrentWeekWorkoutStats(completion: @escaping(Result<[Activity], Error>) -> Void) {
+        let workouts = HKSampleType.workoutType()
+        let predicate = HKQuery.predicateForSamples(withStart: .startOfWeek, end: Date())
+        let query = HKSampleQuery(sampleType: workouts, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { [weak self] _, results, error in
+            guard let workouts = results as? [HKWorkout], let self = self, error == nil else {
+                completion(.failure(NSError()))
+                return
+            }
+            
+            var runningCount: Int = 0
+            var strengthCount: Int = 0
+            var soccerCount: Int = 0
+            var basketballCount: Int = 0
+            var stairsCount: Int = 0
+            var kickboxingCount: Int = 0
+            
+            for workout in workouts {
+                let duration = Int(workout.duration)/60
+                if workout.workoutActivityType == .running {
+                    runningCount += duration
+                } else if workout.workoutActivityType == .traditionalStrengthTraining {
+                    strengthCount += duration
+                } else if workout.workoutActivityType == .soccer {
+                    soccerCount += duration
+                } else if workout.workoutActivityType == .basketball {
+                    basketballCount += duration
+                } else if workout.workoutActivityType == .stairClimbing {
+                    stairsCount += duration
+                } else if workout.workoutActivityType == .kickboxing {
+                    kickboxingCount += duration
+                }
+            }
+            
+            completion(.success(generateActivitiesFromDurations(running: runningCount, strength: strengthCount, soccer: soccerCount, basketball: basketballCount, stairs: stairsCount, kickboxing: kickboxingCount)))
+        }
+        
+        healthStore.execute(query)
+    }
+    
+    func generateActivitiesFromDurations(running: Int, strength: Int, soccer: Int, basketball: Int, stairs: Int, kickboxing: Int)-> [Activity] {
+        return [
+            Activity(title: "Running", subtitle: "This week", image: "figure.run", tintColor: .green, amount: "\(running) mins"),
+            Activity(title: "Strength Training", subtitle: "This week", image: "dumbbell", tintColor: .green, amount: "\(strength) mins"),
+            Activity(title: "Soccer", subtitle: "This week", image: "figure.soccer", tintColor: .green, amount: "\(soccer) mins"),
+            Activity(title: "Basketball", subtitle: "This week", image: "figure.basketball", tintColor: .green, amount: "\(basketball) mins"),
+            Activity(title: "Stairstepper", subtitle: "This week", image: "figure.stairs", tintColor: .green, amount: "\(running) mins"),
+            Activity(title: "Kickboxing", subtitle: "This week", image: "figure.kickboxing", tintColor: .green, amount: "\(running) mins"),
+
+        ]
     }
 }

@@ -23,15 +23,15 @@ struct FitnessTabView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             HomeView()
-                .tag("Home") // For tag, normally uased as int or string, string preferable
+                .tag("Home") // For tag, normally used as int or string, string preferable
                 .tabItem {
                     Image(systemName: "house") // system name for SF symbols
                     
                     Text("Home")
                 }
             
-            HistoricDataView()
-                .tag("Historic")
+            ChartsView()
+                .tag("Charts")
                 .tabItem {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                     

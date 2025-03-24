@@ -8,16 +8,18 @@
 import Foundation
 
 class HomeViewModel: ObservableObject {
+        
+    let healthManager = HealthManager.shared ///Singleton instance of 'HealthManager' to interact with HealthKit data
     
-    // Published let's the class know that changes to this variable needs to be published and view will be updated
-    
-    let healthManager = HealthManager.shared
-    
+    // MARK: VARIABLE
+    /// Published let's the class know that changes to this variable needs to be published and view will be updated
     @Published var calories: Int = 0
     @Published var exercise: Int = 0
     @Published var stand: Int  = 0
     
-    @Published var activities = [Activity]()
+    @Published var activities = [Activity]() /// List of fitness activities
+    
+    /// Sample list of recent workouts (for UI preview/testing purpose)
     @Published var workouts = [
         Workout(id: 0, title: "Running", image: "figure.run", tintColor: .cyan, duration: "51 mins", date: "Aug 1", calories: "512 kcal"),
         Workout(id: 1, title: "Strength Training", image: "figure.run", tintColor: .red, duration: "52 mins", date: "Aug 2", calories: "600 kcal"),
@@ -25,6 +27,7 @@ class HomeViewModel: ObservableObject {
         Workout(id: 3, title: "Running", image: "figure.run", tintColor: .cyan, duration: "51 mins", date: "Aug 1", calories: "512 kcal"),
     ]
     
+    /// Mock activity data for testing UI
     var mockActivities = [
         Activity(title: "Today steps", subtitle: "Goal 12,000", image: "figure.walk", tintColor: .green, amount: "9812"),
         Activity(title: "Today steps", subtitle: "Goal 1,000", image: "figure.walk", tintColor: .red, amount: "812"),
@@ -32,6 +35,7 @@ class HomeViewModel: ObservableObject {
         Activity(title: "Today steps", subtitle: "Goal 50,000", image: "figure.walk", tintColor: .purple, amount: "104,812"),
     ]
     
+    /// Mock workout data for testing UI.
     var mockWorkouts = [
         Workout(id: 0, title: "Running", image: "figure.run", tintColor: .cyan, duration: "51 mins", date: "Aug 1", calories: "512 kcal"),
         Workout(id: 1, title: "Strength Training", image: "figure.run", tintColor: .red, duration: "52 mins", date: "Aug 2", calories: "600 kcal"),
@@ -39,6 +43,9 @@ class HomeViewModel: ObservableObject {
         Workout(id: 3, title: "Running", image: "figure.run", tintColor: .cyan, duration: "51 mins", date: "Aug 1", calories: "512 kcal"),
     ]
     
+    /// Initializes the ViewModel and requests HealthKit access
+    /// Calls multiple fetch functions to retrieve health data.
+    // MARK: INITIALISATION
     init() {
         Task {
             do {
@@ -57,6 +64,9 @@ class HomeViewModel: ObservableObject {
         
     }
     
+    
+    // MARK: FETCHTODAYCALORIES() FUNCTION
+    /// Fetch today's calories burn from HealthKit and updates the 'activities' array.
     func fetchTodayCalories() {
         healthManager.fetchTodayCaloriesBurned { result in
             switch result {
@@ -73,6 +83,9 @@ class HomeViewModel: ObservableObject {
         }
     }
     
+    
+    // MARK: FETCHTODAYEXERCISETIME() FUNCTION
+    /// Fetches today's exercise time from HealthKit
     func fetchTodayExerciseTime() {
         healthManager.fetchTodayExerciseTime { result in
             switch result {
@@ -86,6 +99,9 @@ class HomeViewModel: ObservableObject {
         }
     }
     
+    
+    // MARK: FETCHTODAYSTANDHOURS() FUNCTION
+    /// Fetches today's stand hours from HealthKit.
     func fetchTodayStandHours() {
         healthManager.fetchTodayStandHours { result in
             switch result {
@@ -99,7 +115,8 @@ class HomeViewModel: ObservableObject {
         }
     }
     
-    // MARK: Fitness Activity
+    // MARK: Fitness Activity DATA
+    /// fetches today's step count from HealtKit and updates the 'activities' array.
     func fetchTodaysSteps() {
         healthManager.fetchTodaySteps { result in
             switch result {
@@ -113,6 +130,9 @@ class HomeViewModel: ObservableObject {
         }
     }
     
+    
+    // MARK: FETCHCURRENTWEEKACTIVITIES() FUNCTION
+    /// Fetches workout statistic for the current week from HealthKit
     func fetchCurrentWeekActivities() {
         healthManager.fetchCurrentWeekWorkoutStats { result in
             switch result {
@@ -126,7 +146,10 @@ class HomeViewModel: ObservableObject {
         }
     }
     
-    // MARK: Recent Workouts
+    // MARK: Recent Workouts FUNCTION
+    /// Fetches recent workouts from HealthKit for the current month
+    /// Limits the displayed workouts to the most recent 4 entries
+    
     func fetchRecentWorkouts() {
         healthManager.fetchWorkoutsForMonth(month: Date()) { result in
             switch result {

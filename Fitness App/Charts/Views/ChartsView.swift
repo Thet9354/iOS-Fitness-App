@@ -11,7 +11,13 @@ import Charts
 struct DailyStepModel: Identifiable {
     let id = UUID()
     let date: Date
-    let count: Double
+    let count: Int
+}
+
+struct MonthlyStepModel: Identifiable {
+    let id = UUID()
+    let date: Date
+    let count: Int
 }
 
 /// Represents different time range options for displaying chart data.
@@ -26,7 +32,7 @@ enum ChartOptions: String, CaseIterable {
 
 class ChartsViewModel: ObservableObject {
     
-    var mockChartData = [
+    var mockWeekChartData = [
         DailyStepModel(date: Date(), count: 12315),
         DailyStepModel(date: Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date(), count: 9775),
         DailyStepModel(date: Calendar.current.date(byAdding: .day, value: -2, to: Date()) ?? Date(), count: 9775),
@@ -34,6 +40,18 @@ class ChartsViewModel: ObservableObject {
         DailyStepModel(date: Calendar.current.date(byAdding: .day, value: -4, to: Date()) ?? Date(), count: 9775),
         DailyStepModel(date: Calendar.current.date(byAdding: .day, value: -5, to: Date()) ?? Date(), count: 9775),
         DailyStepModel(date: Calendar.current.date(byAdding: .day, value: -6, to: Date()) ?? Date(), count: 9775),
+    ]
+    
+    
+    var mockYTDChartData = [
+        MonthlyStepModel(date: Date(), count: 122315),
+        MonthlyStepModel(date: Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date(), count: 97752),
+        MonthlyStepModel(date: Calendar.current.date(byAdding: .month, value: -2, to: Date()) ?? Date(), count: 97175),
+        MonthlyStepModel(date: Calendar.current.date(byAdding: .month, value: -3, to: Date()) ?? Date(), count: 97175),
+        MonthlyStepModel(date: Calendar.current.date(byAdding: .month, value: -4, to: Date()) ?? Date(), count: 8372),
+        MonthlyStepModel(date: Calendar.current.date(byAdding: .month, value: -5, to: Date()) ?? Date(), count: 37168),
+        MonthlyStepModel(date: Calendar.current.date(byAdding: .month, value: -6, to: Date()) ?? Date(), count: 97875),
+        MonthlyStepModel(date: Calendar.current.date(byAdding: .month, value: -7, to: Date()) ?? Date(), count: 97175),
     ]
     
     @Published var mockOneMonthData = [DailyStepModel]()
@@ -70,7 +88,7 @@ class ChartsViewModel: ObservableObject {
             let randomStepCount = Int.random(in: 500...15000) // Generating a random step count between 5000 and 15000
             
             /// Create a `DailyStepModel` object with the generated date and step count.
-            let dailyStepData = DailyStepModel(date: currentDate, count: Double(randomStepCount))
+            let dailyStepData = DailyStepModel(date: currentDate, count: randomStepCount)
             
             /// Append the newly created step data to the mock data array.
             mockData.append(dailyStepData)
@@ -99,7 +117,7 @@ struct ChartsView: View {
                 switch selectedChart {
                 case .oneWeek:
                     Chart {
-                        ForEach(viewModel.mockChartData) { data in
+                        ForEach(viewModel.mockWeekChartData) { data in
                             BarMark(x: .value(data.date.formatted(), data.date, unit: .day), y: .value("Steps", data.count))
                         }
                     }
@@ -116,10 +134,14 @@ struct ChartsView: View {
                         }
                     }
                 case .yearToDate:
-                    EmptyView()
+                    Chart {
+                        ForEach(viewModel.mockYTDChartData) { data in
+                            BarMark(x: .value(data.date.formatted(), data.date, unit: .month), y: .value("Steps", data.count))
+                        }
+                    }
                 case .oneYear:
                     Chart {
-                        ForEach(viewModel.mockChartData) { data in
+                        ForEach(viewModel.mockWeekChartData) { data in
                             BarMark(x: .value(data.date.formatted(), data.date, unit: .day), y: .value("Steps", data.count))
                         }
                     }

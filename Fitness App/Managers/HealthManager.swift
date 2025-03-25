@@ -27,7 +27,7 @@ extension Date {
     
     /// Returns the start and end dates of the month for the given date.
     /// - Returns: A tuple containing the first day and the last day of the month.
-    func fetchMonthStartAndEndDates() -> (Date, Date) {
+    func fetchMonthStartAndEndDate() -> (Date, Date) {
         let calendar = Calendar.current
         
         // Extract the year and month components from the current date
@@ -285,7 +285,7 @@ class HealthManager {
     func fetchWorkoutsForMonth(month: Date, completion: @escaping (Result<[Workout], Error>) -> Void) {
         let workouts = HKSampleType.workoutType()
         
-        let (startDate, endDate) = month.fetchMonthStartAndEndDates()
+        let (startDate, endDate) = month.fetchMonthStartAndEndDate()
         
         let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate)
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
@@ -301,6 +301,49 @@ class HealthManager {
         }
         healthStore.execute(query)
     }
+}
+
+// MARK: CHARTSVIEW DATA
+extension HealthManager {
     
+    struct YearChartDataResult {
+        let ytd: [MonthlyStepModel]
+        let oneYear: [MonthlyStepModel]
+    }
     
+    func fetchYTDAndOneYearChartData(completion: @escaping (Result<YearChartDataResult, Error>) -> Void) {
+        let steps = HKQuantityType(.stepCount)
+        let calendar = Calendar.current
+        
+        var oneYearmonths = [MonthlyStepModel]()
+        var ytdMonths = [MonthlyStepModel]()
+        
+        for i in 0...11 {
+            let month = calendar.date(byAdding: .month, value: -i, to: Date()) ?? Date()
+            let (startOfMonth, endOfMonth) = month.fetchMonthStartAndEndDate()
+            let predicate = HKQuery.predicateForSamples(withStart: startOfMonth, end: endOfMonth)
+            let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate) { _, results,
+                error in
+                guard let steps = results?.sumQuantity()?.doubleValue(for: .count()), error == nil else {
+                    completion(.failure(URLError(.badURL)))
+                    return
+                }
+                
+                if i == 0 {
+                    oneYearmonths.append(MonthlyStepModel(date: month, count: Int(steps)))
+                    ytdMonths.append(MonthlyStepModel(date: month, count: Int(steps)))
+                } else {
+                    oneYearmonths.append(MonthlyStepModel(date: month, count: Int(steps)))
+                    if calendar.component(.year, from: Date()) == calendar.component(.year, from: month) {
+                        ytdMonths.append(MonthlyStepModel(date: month, count: Int(steps)))
+                    }
+                }
+                
+                if i == 11 {
+                    completion(.success(YearChartDataResult(ytd: ytdMonths, oneYear: oneYearmonths)))
+                }
+            }
+            healthStore.execute(query)
+        }
+    }
 }

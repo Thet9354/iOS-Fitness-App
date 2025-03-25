@@ -44,21 +44,27 @@ class ChartsViewModel: ObservableObject {
     @Published var threeMonthAverage = 97875
     @Published var threeMonthTotal = 6
     
-    @Published var ytdAverage = 97175
-    @Published var ytdTotal = 4
+    @Published var ytdChartData = [MonthlyStepModel]()
+    @Published var ytdAverage = 0
+    @Published var ytdTotal = 0
     
-    @Published var oneYearAverage = 97752
-    @Published var oneYearTotal = 10
+    @Published var oneYearChartData = [MonthlyStepModel]()
+    @Published var oneYearAverage = 0
+    @Published var oneYearTotal = 0
+    
+    let healthManager = HealthManager.shared
     
     /// Initializes the mock data with random step counts for the past 90 days.
     init() {
         
-        var mockOneMonth = mockDataForDays(days: 30)
-        var mockThreeMonths = self.mockDataForDays(days: 90)
+        let mockOneMonth = mockDataForDays(days: 30)
+        let mockThreeMonths = self.mockDataForDays(days: 90)
         DispatchQueue.main.async {
             self.mockOneMonthData = mockOneMonth
             self.mockThreeMonthData = mockThreeMonths
         }
+        
+        fetchYTDAndOneYearData()
     }
     
     func mockDataForDays(days: Int) -> [DailyStepModel] {
@@ -89,4 +95,23 @@ class ChartsViewModel: ObservableObject {
         return mockData
     }
 
+    func fetchYTDAndOneYearData() {
+        healthManager.fetchYTDAndOneYearChartData { result in
+            switch result {
+            case .success(let result):
+                DispatchQueue.main.async {
+                    self.ytdChartData = result.ytd
+                    self.oneYearChartData = result.oneYear
+                    
+                    self.ytdTotal = self.ytdChartData.reduce(0, { $0 + $1.count })
+                    self.oneYearTotal = self.oneYearChartData.reduce(0, { $0 + $1.count })
+                    
+                    self.ytdAverage = self.ytdTotal / Calendar.current.component(.month, from: Date())
+                    self.oneYearAverage = self.oneYearTotal / 12
+                }
+            case .failure(let failure):
+                print(failure.localizedDescription)
+            }
+        }
+    }
 }

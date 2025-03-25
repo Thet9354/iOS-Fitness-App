@@ -67,6 +67,9 @@ class HomeViewModel: ObservableObject {
     
     // MARK: FETCHTODAYCALORIES() FUNCTION
     /// Fetch today's calories burn from HealthKit and updates the 'activities' array.
+    /// Uses 'fetchTodayCaloriesBurned' from 'HealthManager' to retrieve the values
+    /// Converts the returned value into an integer and updates the 'calories' property
+    /// Creates an 'Activity' object with the calories value ad appends it to activities
     func fetchTodayCalories() {
         healthManager.fetchTodayCaloriesBurned { result in
             switch result {
@@ -85,7 +88,9 @@ class HomeViewModel: ObservableObject {
     
     
     // MARK: FETCHTODAYEXERCISETIME() FUNCTION
-    /// Fetches today's exercise time from HealthKit
+    /// Fetches today's total exercise time in minutes from HealthKit.
+    /// Uses `fetchTodayExerciseTime` from `HealthManager`.
+    /// Updates the `exercise` property to trigger UI updates.
     func fetchTodayExerciseTime() {
         healthManager.fetchTodayExerciseTime { result in
             switch result {
@@ -101,7 +106,9 @@ class HomeViewModel: ObservableObject {
     
     
     // MARK: FETCHTODAYSTANDHOURS() FUNCTION
-    /// Fetches today's stand hours from HealthKit.
+    /// Fetches the number of stand hours recorded for today from HealthKit.
+    /// Uses `fetchTodayStandHours` from `HealthManager`.
+    /// Updates the `stand` property to reflect the latest stand hour count.
     func fetchTodayStandHours() {
         healthManager.fetchTodayStandHours { result in
             switch result {
@@ -116,7 +123,9 @@ class HomeViewModel: ObservableObject {
     }
     
     // MARK: Fitness Activity DATA
-    /// fetches today's step count from HealtKit and updates the 'activities' array.
+    /// Fetches the total steps taken today from HealthKit and appends it to `activities`.
+    /// - Uses `fetchTodaySteps` from `HealthManager` to get step count.
+    /// - Adds the retrieved data as an `Activity` object in the `activities` list.
     func fetchTodaysSteps() {
         healthManager.fetchTodaySteps { result in
             switch result {
@@ -133,6 +142,8 @@ class HomeViewModel: ObservableObject {
     
     // MARK: FETCHCURRENTWEEKACTIVITIES() FUNCTION
     /// Fetches workout statistic for the current week from HealthKit
+    /// - Uses `fetchCurrentWeekWorkoutStats` from `HealthManager`.
+    /// - Updates the `activities` array to include the weekly activity stats.
     func fetchCurrentWeekActivities() {
         healthManager.fetchCurrentWeekWorkoutStats { result in
             switch result {
@@ -148,8 +159,8 @@ class HomeViewModel: ObservableObject {
     
     // MARK: Recent Workouts FUNCTION
     /// Fetches recent workouts from HealthKit for the current month
-    /// Limits the displayed workouts to the most recent 4 entries
-    
+    /// - Uses 'fetchWorkoutsForMonth' from 'HealthManager'
+    /// - Limits the number of workouts displayed to the 4 most recent entries
     func fetchRecentWorkouts() {
         healthManager.fetchWorkoutsForMonth(month: Date()) { result in
             switch result {

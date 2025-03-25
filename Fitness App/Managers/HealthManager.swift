@@ -11,11 +11,13 @@ import HealthKit
 /// Extension to add a computed property for getting the start of the current day
 extension Date {
     
+    // Returns the start of the current day
     static var startOfDay: Date {
         let calendar = Calendar.current
         return calendar.startOfDay(for: Date()) // return the start of the current day
     }
     
+    /// Returns the start of the current week (Monday as start day)
     static var startOfWeek: Date {
         let calendar = Calendar.current
         var components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())
@@ -40,6 +42,8 @@ extension Date {
         return (startDate, endDate)
     }
     
+    /// Formats a date for workout display (e.g., "MM d").
+    /// Returns: A formatted date string
     func formatWorkoutDate() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MM d"
@@ -47,8 +51,11 @@ extension Date {
     }
 }
 
+/// Extension to format numbers for display
 extension Double {
     
+    /// Formats a number as a string with no decimal places.
+    /// - Returns: A formatted string representation of the number
     func formattedNumberString() -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -79,6 +86,7 @@ class HealthManager {
         }
     }
     
+    /// Requests authorization for HealthKit data access
     func requestHealthKitAccess() async throws {
         let calories = HKQuantityType(.activeEnergyBurned)
         let exercise = HKQuantityType(.appleExerciseTime)
@@ -115,7 +123,7 @@ class HealthManager {
         healthStore.execute(query)
     }
     
-    
+    /// Fetches the total exercise time for the current day
     func fetchTodayExerciseTime(completion: @escaping(Result<Double, Error>) -> Void) {
         let exercise = HKQuantityType(.appleExerciseTime)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
@@ -174,6 +182,7 @@ class HealthManager {
     }
     
     // MARK: Fitness Activity
+    /// Fetches today's step count
     func fetchTodaySteps(completion: @escaping (Result<Activity, Error>) -> Void) {
         let steps = HKQuantityType(.stepCount)
         
@@ -220,7 +229,7 @@ class HealthManager {
         healthStore.execute(query)
     }
 
-    
+    /// Fetches the user's workout statistics for the current week
     func fetchCurrentWeekWorkoutStats(completion: @escaping(Result<[Activity], Error>) -> Void) {
         let workouts = HKSampleType.workoutType()
         let predicate = HKQuery.predicateForSamples(withStart: .startOfWeek, end: Date())

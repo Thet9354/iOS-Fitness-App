@@ -269,6 +269,7 @@ class HealthManager {
         healthStore.execute(query)
     }
     
+    
     func generateActivitiesFromDurations(running: Int, strength: Int, soccer: Int, basketball: Int, stairs: Int, kickboxing: Int)-> [Activity] {
         return [
             Activity(title: "Running", subtitle: "This week", image: "figure.run", tintColor: .green, amount: "\(running) mins"),
@@ -282,6 +283,10 @@ class HealthManager {
     }
     
     // MARK: Recent Workouts
+    /// Fetches workouts for a given month
+    /// - Paramters:
+    /// - month: The date representing the month to fetch workouts for
+    /// - completion: A completion handler retunring 'Result' with an array of 'Workout' or an error
     func fetchWorkoutsForMonth(month: Date, completion: @escaping (Result<[Workout], Error>) -> Void) {
         let workouts = HKSampleType.workoutType()
         
@@ -306,11 +311,14 @@ class HealthManager {
 // MARK: CHARTSVIEW DATA
 extension HealthManager {
     
+    /// Structure to hold year-to-date and one-year step data.
     struct YearChartDataResult {
-        let ytd: [MonthlyStepModel]
-        let oneYear: [MonthlyStepModel]
+        let ytd: [MonthlyStepModel] // Steps data for the current year-to-date
+        let oneYear: [MonthlyStepModel] // Steps data for the last 12 months
     }
     
+    /// Fetches step count data for the past 12 months and year-to-date
+    /// - Paramter completion: A completion handler returning a 'Resut'
     func fetchYTDAndOneYearChartData(completion: @escaping (Result<YearChartDataResult, Error>) -> Void) {
         let steps = HKQuantityType(.stepCount)
         let calendar = Calendar.current

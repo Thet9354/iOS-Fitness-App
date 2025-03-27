@@ -81,7 +81,7 @@ class HomeViewModel: ObservableObject {
                     self.activities.append(activity)
                 }
             case .failure(let failure):
-                print(failure.localizedDescription)
+                print("Fucked up")
             }
         }
     }

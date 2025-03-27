@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct FitnessTabView: View {
-    
+    @AppStorage("username") var username: String?
+
+    @State var showTerms = true
     @State var selectedTab = "Home" //State: Changes to the value update the state of UI
     
     init() {
@@ -37,6 +39,17 @@ struct FitnessTabView: View {
                     
                     Text("Charts")
                 }
+            
+            LeaderboardView(showTerms: $showTerms)
+                .tag("Leaderboards")
+                .tabItem {
+                    Image(systemName: "list.bullet")
+                    
+                    Text("Leaderboard")
+                }
+        }
+        .onAppear {
+            showTerms = username == nil
         }
     }
 }

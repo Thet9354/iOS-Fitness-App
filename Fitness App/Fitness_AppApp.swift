@@ -6,9 +6,19 @@
 //
 
 import SwiftUI
+import FirebaseCore
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+  func application(_ application: UIApplication,
+                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    FirebaseApp.configure()
+    return true
+  }
+}
 
 @main
 struct Fitness_AppApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     /// MVVM model
     /// Model(Data and Logic): The Model represents the data and encapsulates the core business logic of the application. It manages the data and provides methods for data manipulation,

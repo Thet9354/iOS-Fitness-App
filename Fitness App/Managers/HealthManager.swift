@@ -49,6 +49,32 @@ extension Date {
         formatter.dateFormat = "MM d"
         return formatter.string(from: self)
     }
+    
+    func fetchPreviousMonday() -> Date {
+        // Create a calendar instance
+        let calendar = Calendar.current
+        
+        // Get the weekday of the current date (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+        let weekday = calendar.component(.weekday, from: self)
+        
+        // Calculate the number of days to subtract to get to the previous Monday
+        let daysToSubtract = (weekday + 5) % 7
+        
+        // Create data components for the subtraction
+        var dataComponents = DateComponents()
+        dataComponents.day = -daysToSubtract
+        
+        // Calculate the date of the previous Monday (or today if it's Monday)
+        return calendar.date(byAdding: dataComponents, to: self) ?? Date()
+        
+    }
+    
+    func mondayDateFormat() -> String {
+        let monday = self.fetchPreviousMonday()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM-dd-yyyy"
+        return formatter.string(from: monday)
+    }
 }
 
 /// Extension to format numbers for display

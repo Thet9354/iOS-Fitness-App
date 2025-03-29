@@ -18,11 +18,9 @@ class DatabaseManager {
     let weeklyLeaderboard = "\(Date().mondayDateFormat())-leaderboard"
     
     // MARK: FETCH LEADERBOARD
-    func fetchLeaderboard() async throws {
+    func fetchLeaderboard() async throws -> [LeaderboardUser] {
         let snapshot = try await database.collection(weeklyLeaderboard).getDocuments()
-        
-        print(snapshot.documents)
-        print(snapshot.documents.first?.data())
+        return try snapshot.documents.compactMap({ try $0.data(as: LeaderboardUser.self) })
     }
     
     // MARK: POST (UPDATE) LEADERBOARD FOR CURRENT USER

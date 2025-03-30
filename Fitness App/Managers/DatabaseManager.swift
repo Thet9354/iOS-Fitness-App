@@ -14,20 +14,19 @@ class DatabaseManager {
     
     private init() {}
     
-    let database = Firestore.firestore()
+    private let database = Firestore.firestore()
     let weeklyLeaderboard = "\(Date().mondayDateFormat())-leaderboard"
     
     // MARK: FETCH LEADERBOARD
-    func fetchLeaderboard() async throws -> [LeaderboardUser] {
+    func fetchLeaderboards() async throws -> [LeaderboardUser] {
         let snapshot = try await database.collection(weeklyLeaderboard).getDocuments()
         return try snapshot.documents.compactMap({ try $0.data(as: LeaderboardUser.self) })
     }
     
     // MARK: POST (UPDATE) LEADERBOARD FOR CURRENT USER
-    func postStepCountUpdateFor(username: String, count: Int) async throws {
-        let leader = LeaderboardUser(username: username, count: count)
+    func postStepCountUpdateForUser(leader: LeaderboardUser) async throws {
         let data = try Firestore.Encoder().encode(leader)
-        try await database.collection(weeklyLeaderboard).document(username).setData(data, merge: false)
+        try await database.collection(weeklyLeaderboard).document(leader.username).setData(data, merge: false)
     }
     
 }

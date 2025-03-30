@@ -7,29 +7,6 @@
 
 import SwiftUI
 
-struct LeaderboardUser: Codable, Identifiable {
-    let id = UUID()
-    let username: String
-    let count: Int
-}
-
-class LeaderboardViewModel: ObservableObject {
-    
-    var mockData = [
-        LeaderboardUser(username: "Frederick", count: 4124),
-        LeaderboardUser(username: "Jason", count: 1124),
-        LeaderboardUser(username: "You", count: 41204),
-        LeaderboardUser(username: "Paul Hudson", count: 4124),
-        LeaderboardUser(username: "Logan", count: 11124),
-        LeaderboardUser(username: "Seanallen", count: 124),
-        LeaderboardUser(username: "Jackson", count: 12344),
-        LeaderboardUser(username: "Catalin", count: 13244),
-        LeaderboardUser(username: "Paul", count: 14433),
-        LeaderboardUser(username: "Eric", count: 12654),
-        LeaderboardUser(username: "Nathan", count: 11345),
-        LeaderboardUser(username: "Xavier", count: 12856),
-    ]
-}
 
 struct LeaderboardView: View {
     
@@ -56,7 +33,7 @@ struct LeaderboardView: View {
             .padding()
             
             LazyVStack(spacing: 24) {
-                ForEach(viewModel.mockData) { person in
+                ForEach(viewModel.leaders) { person in
                     HStack {
                         Text("1.")
                         

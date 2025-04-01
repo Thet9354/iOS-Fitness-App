@@ -49,6 +49,7 @@ struct FitnessTabView: View {
                 }
         }
         .onAppear {
+            print(username)
             showTerms = username == nil
         }
     }

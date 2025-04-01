@@ -7,14 +7,16 @@
 
 import SwiftUI
 
-
+/// 'LeaderboardView' displays the top 10 users based on step count, along with the current user's ranking if applicable
 struct LeaderboardView: View {
     
     // MARK: VARIABLE
-    @StateObject var viewModel = LeaderboardViewModel()
     
-    @Binding var showTerms: Bool
+    @AppStorage("username") var username: String? /// Stroes the logged-in username using '@AppStorage' to persust user settings
+    @StateObject var viewModel = LeaderboardViewModel() /// The view model responsible for managing leaderboard data
+    @Binding var showTerms: Bool ///Controls whether the terms and conditions view is displayed
     
+    // MARK: BODY
     var body: some View {
         VStack {
             Text("Leaderboard")
@@ -32,12 +34,19 @@ struct LeaderboardView: View {
             }
             .padding()
             
+            // Display top 10 users using a LazyVStack for efficency
             LazyVStack(spacing: 24) {
-                ForEach(viewModel.leaders) { person in
+                ForEach(Array(viewModel.leaderResult.top10.enumerated()), id: \.element.id) { (idx, person) in
                     HStack {
-                        Text("1.")
+                        Text("\(idx + 1).")
                         
                         Text(person.username)
+                        
+                        // Highlight the logged-in user's entry with a crown icon
+                        if username == person.username {
+                            Image(systemName: "crown.fill")
+                                .foregroundColor(.yellow)
+                        }
                         
                         Spacer()
                         
@@ -47,8 +56,28 @@ struct LeaderboardView: View {
                 }
             }
             
+            // If the current user is not in the top 10, show their ranking separately
+            if let user = viewModel.leaderResult.user {
+                Image(systemName: "ellipsis")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 48, height: 48)
+                    .foregroundColor(.gray.opacity(0.5))
+                
+                HStack {
+                    Text(user.username)
+                    
+                    Spacer()
+                    
+                    Text("\(user.count)")
+                }
+                .padding(.horizontal)
+            }
+            
         }
         .frame(maxHeight: .infinity, alignment: .top)
+        
+        // Display TermsView in full screen when showTerms is True
         .fullScreenCover(isPresented: $showTerms) {
             TermsView()
         }

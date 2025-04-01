@@ -50,27 +50,8 @@ extension Date {
         return formatter.string(from: self)
     }
     
-    func fetchPreviousMonday() -> Date {
-        // Create a calendar instance
-        let calendar = Calendar.current
-        
-        // Get the weekday of the current date (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
-        let weekday = calendar.component(.weekday, from: self)
-        
-        // Calculate the number of days to subtract to get to the previous Monday
-        let daysToSubtract = (weekday + 5) % 7
-        
-        // Create data components for the subtraction
-        var dataComponents = DateComponents()
-        dataComponents.day = -daysToSubtract
-        
-        // Calculate the date of the previous Monday (or today if it's Monday)
-        return calendar.date(byAdding: dataComponents, to: self) ?? Date()
-        
-    }
-    
     func mondayDateFormat() -> String {
-        let monday = self.fetchPreviousMonday()
+        let monday = Date.startOfWeek
         let formatter = DateFormatter()
         formatter.dateFormat = "MM-dd-yyyy"
         return formatter.string(from: monday)
@@ -379,5 +360,24 @@ extension HealthManager {
             }
             healthStore.execute(query)
         }
+    }
+}
+
+// MARK: LEADERBOARD VIEW
+extension HealthManager {
+    
+    func fetchCurrentWeekStepCount(completion: @escaping (Result<Double, Error>) -> Void) {
+        let steps = HKQuantityType(.stepCount)
+        let predicate = HKQuery.predicateForSamples(withStart: .startOfWeek, end: Date())
+        let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate) { _, results, error in
+            guard let quantity = results?.sumQuantity(), error == nil else {
+                completion(.failure(URLError(.badURL)))
+                return
+            }
+            
+            let steps = quantity.doubleValue(for: .count())
+            completion(.success(steps))
+        }
+        healthStore.execute(query)
     }
 }

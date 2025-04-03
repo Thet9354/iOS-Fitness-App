@@ -18,68 +18,70 @@ struct LeaderboardView: View {
     
     // MARK: BODY
     var body: some View {
-        VStack {
-            Text("Leaderboard")
-                .font(.largeTitle)
-                .bold()
-            
-            HStack {
-                Text("Name")
+        ZStack {
+            VStack {
+                Text("Leaderboard")
+                    .font(.largeTitle)
                     .bold()
                 
-                Spacer()
+                HStack {
+                    Text("Name")
+                        .bold()
+                    
+                    Spacer()
+                    
+                    Text("Steps")
+                        .bold()
+                }
+                .padding()
                 
-                Text("Steps")
-                    .bold()
-            }
-            .padding()
-            
-            // Display top 10 users using a LazyVStack for efficency
-            LazyVStack(spacing: 24) {
-                ForEach(Array(viewModel.leaderResult.top10.enumerated()), id: \.element.id) { (idx, person) in
-                    HStack {
-                        Text("\(idx + 1).")
-                        
-                        Text(person.username)
-                        
-                        // Highlight the logged-in user's entry with a crown icon
-                        if username == person.username {
-                            Image(systemName: "crown.fill")
-                                .foregroundColor(.yellow)
+                // Display top 10 users using a LazyVStack for efficency
+                LazyVStack(spacing: 24) {
+                    ForEach(Array(viewModel.leaderResult.top10.enumerated()), id: \.element.id) { (idx, person) in
+                        HStack {
+                            Text("\(idx + 1).")
+                            
+                            Text(person.username)
+                            
+                            // Highlight the logged-in user's entry with a crown icon
+                            if username == person.username {
+                                Image(systemName: "crown.fill")
+                                    .foregroundColor(.yellow)
+                            }
+                            
+                            Spacer()
+                            
+                            Text("\(person.count)")
                         }
+                        .padding(.horizontal)
+                    }
+                }
+                
+                // If the current user is not in the top 10, show their ranking separately
+                if let user = viewModel.leaderResult.user {
+                    Image(systemName: "ellipsis")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 48, height: 48)
+                        .foregroundColor(.gray.opacity(0.5))
+                    
+                    HStack {
+                        Text(user.username)
                         
                         Spacer()
                         
-                        Text("\(person.count)")
+                        Text("\(user.count)")
                     }
                     .padding(.horizontal)
                 }
             }
+            .frame(maxHeight: .infinity, alignment: .top)
             
-            // If the current user is not in the top 10, show their ranking separately
-            if let user = viewModel.leaderResult.user {
-                Image(systemName: "ellipsis")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 48, height: 48)
-                    .foregroundColor(.gray.opacity(0.5))
+            if showTerms {
+                Color.white
                 
-                HStack {
-                    Text(user.username)
-                    
-                    Spacer()
-                    
-                    Text("\(user.count)")
-                }
-                .padding(.horizontal)
+                TermsView(showTerms: $showTerms)
             }
-            
-        }
-        .frame(maxHeight: .infinity, alignment: .top)
-        
-        // Display TermsView in full screen when showTerms is True
-        .fullScreenCover(isPresented: $showTerms) {
-            TermsView()
         }
         .onChange(of: showTerms) { _ in
             if !showTerms && username != nil {

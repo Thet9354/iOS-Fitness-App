@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FitnessProfileButtonView: View {
+struct FitnessProfileItemButton: View {
     
     // MARK: VARIABLE
     @State var title: String
@@ -31,5 +31,5 @@ struct FitnessProfileButtonView: View {
 }
 
 #Preview {
-    FitnessProfileButtonView(title: "Edit", image: "square.and.pencil") {}
+    FitnessProfileItemButton(title: "Edit", image: "square.and.pencil") {}
 }

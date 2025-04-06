@@ -78,8 +78,6 @@ struct LeaderboardView: View {
             .frame(maxHeight: .infinity, alignment: .top)
             
             if showTerms {
-                Color.white
-                
                 TermsView(showTerms: $showTerms)
             }
         }

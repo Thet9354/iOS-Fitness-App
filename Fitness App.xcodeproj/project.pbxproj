@@ -35,9 +35,22 @@
 		D37AC1092D851B840012BAF2 /* Fitness AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Fitness AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D32D15E92DA37E280016ECE8 /* Exceptions for "Fitness App" folder in "Fitness App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Fitness-App-Info.plist",
+			);
+			target = D37AC0EE2D851B7F0012BAF2 /* Fitness App */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D37AC0F12D851B7F0012BAF2 /* Fitness App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D32D15E92DA37E280016ECE8 /* Exceptions for "Fitness App" folder in "Fitness App" target */,
+			);
 			path = "Fitness App";
 			sourceTree = "<group>";
 		};
@@ -415,6 +428,8 @@
 				DEVELOPMENT_TEAM = K8FKWBYV9S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Fitness-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Please allow access";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -446,6 +461,8 @@
 				DEVELOPMENT_TEAM = K8FKWBYV9S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Fitness-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Please allow access";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

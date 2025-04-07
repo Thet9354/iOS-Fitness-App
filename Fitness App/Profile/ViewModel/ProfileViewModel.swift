@@ -6,10 +6,11 @@
 //
 
 import Foundation
+import SwiftUI
 
 class ProfileViewModel: ObservableObject {
     
-    @Published var isEdittingName = true
+    @Published var isEdittingName = false
     @Published var currentName: String = ""
     @Published var profileName: String? = UserDefaults.standard.string(forKey: "profileName")
     
@@ -48,6 +49,27 @@ class ProfileViewModel: ObservableObject {
         profileImage = selectedImage
         UserDefaults.standard.set(selectedImage, forKey: "profileImage")
         self.dismissEdit()
+    }
+    
+    func presentEmailApp() {
+        let emailSubject = "Fitness App - Contact Us"
+        let emailRecipient = "thetpine254@gmail.com"
+        
+        let encodedSubject = emailSubject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let encodedRecipient = emailRecipient.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        
+        let urlString = "mailto:\(encodedRecipient)?subject=\(encodedSubject)"
+        
+        guard let url = URL(string: urlString) else { return }
+        
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url)
+        } else {
+            return
+        }
+        
+        
+        
     }
     
 }

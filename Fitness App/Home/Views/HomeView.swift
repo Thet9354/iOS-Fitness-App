@@ -132,6 +132,12 @@ struct HomeView: View {
                 }
             }
         }
+        .alert("Oops", isPresented: $viewModel.presentError) {
+            Text("Ok")
+        } message: {
+            Text("There was an issue fetchingsome of your data. Some health tracking requires an Apple Watch")
+        }
+
     }
 }
 

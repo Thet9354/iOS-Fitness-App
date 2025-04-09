@@ -10,8 +10,8 @@ import SwiftUI
 struct ChartDataView: View {
     
     // MARK: VARIABLE
-    @State var average: Int
-    @State var total: Int
+    @Binding var average: Int
+    @Binding var total: Int
     
     var body: some View {
         HStack {
@@ -49,5 +49,5 @@ struct ChartDataView: View {
 }
 
 #Preview {
-    ChartDataView(average: 123, total: 8461)
+    ChartDataView(average: .constant(123), total: .constant(8461) )
 }

@@ -254,6 +254,34 @@ class HealthManager {
 // MARK: CHARTSVIEW DATA
 extension HealthManager {
     
+    func fetchDailySteps(startDate: Date, completion: @escaping (Result<[DailyStepModel], Error>) -> Void) {
+        let steps = HKQuantityType(.stepCount)
+        let interval = DateComponents(day: 1)
+        
+        let query = HKStatisticsCollectionQuery(
+            quantityType: steps,
+            quantitySamplePredicate: nil,
+            anchorDate: startDate,
+            intervalComponents: interval
+        )
+        
+        query.initialResultsHandler = { _, results, error in
+            guard let result = results, error == nil else {
+                completion(.failure(URLError(.badURL)))
+                return
+            }
+            
+            var dailysteps: [DailyStepModel] = []
+            
+            result.enumerateStatistics(from: startDate, to: Date()) { statistics, stop in
+                dailysteps.append(DailyStepModel(date: statistics.startDate, count: Int(statistics.sumQuantity()?.doubleValue(for: .count()) ?? 0)))
+            }
+            completion(.success(dailysteps))
+        }
+        healthStore.execute(query)
+        
+    }
+    
     /// Structure to hold year-to-date and one-year step data.
     struct YearChartDataResult {
         let ytd: [MonthlyStepModel] // Steps data for the current year-to-date
@@ -275,10 +303,11 @@ extension HealthManager {
             let predicate = HKQuery.predicateForSamples(withStart: startOfMonth, end: endOfMonth)
             let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate) { _, results,
                 error in
-                guard let steps = results?.sumQuantity()?.doubleValue(for: .count()), error == nil else {
-                    completion(.failure(URLError(.badURL)))
-                    return
+                if let error = error, error.localizedDescription != "No data available for the specified predicate." {
+                    completion(.failure(error))
                 }
+                
+                let steps = results?.sumQuantity()?.doubleValue(for: .count()) ?? 0
                 
                 if i == 0 {
                     oneYearmonths.append(MonthlyStepModel(date: month, count: Int(steps)))

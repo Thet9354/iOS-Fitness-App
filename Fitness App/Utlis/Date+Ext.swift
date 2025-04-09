@@ -24,6 +24,24 @@ extension Date {
         return calendar.date(from: components) ?? Date()
     }
     
+    static var oneWeekAgo: Date {
+        let calendar = Calendar.current
+        let date = calendar.date(byAdding: .day, value: -6, to: Date()) ?? Date()
+        return calendar.startOfDay(for: date)
+    }
+    
+    static var oneMonthAgo: Date {
+        let calendar = Calendar.current
+        let date = calendar.date(byAdding: .month, value: -1, to: Date()) ?? Date()
+        return calendar.startOfDay(for: date)
+    }
+    
+    static var threeMonthsAgo: Date {
+        let calendar = Calendar.current
+        let date = calendar.date(byAdding: .month, value: -3, to: Date()) ?? Date()
+        return calendar.startOfDay(for: date)
+    }
+    
     /// Returns the start and end dates of the month for the given date.
     /// - Returns: A tuple containing the first day and the last day of the month.
     func fetchMonthStartAndEndDate() -> (Date, Date) {

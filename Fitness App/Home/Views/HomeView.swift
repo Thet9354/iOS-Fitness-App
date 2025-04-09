@@ -133,9 +133,9 @@ struct HomeView: View {
             }
         }
         .alert("Oops", isPresented: $viewModel.presentError) {
-            Text("Ok")
+            Button("Ok", role: .cancel) { }
         } message: {
-            Text("There was an issue fetchingsome of your data. Some health tracking requires an Apple Watch")
+            Text("There was an issue fetching some of your data. Some health tracking requires an Apple Watch.")
         }
 
     }

@@ -31,11 +31,11 @@ struct ChartsView: View {
                 case .oneWeek:
                     VStack {
                         /// Displays average and total steps for one week
-                        ChartDataView(average: viewModel.oneWeekAverage, total: viewModel.oneWeekTotal)
+                        ChartDataView(average: $viewModel.oneWeekAverage, total: $viewModel.oneWeekTotal)
                         
                         // Bar chart visualisation for weekly step data
                         Chart {
-                            ForEach(viewModel.mockWeekChartData) { data in
+                            ForEach(viewModel.oneWeekChartData) { data in
                                 BarMark(x: .value(data.date.formatted(), data.date, unit: .day), y: .value("Steps", data.count))
                             }
                         }
@@ -43,11 +43,11 @@ struct ChartsView: View {
                 case .oneMonth:
                     VStack {
                         /// Displays average and total steps for one month
-                        ChartDataView(average: viewModel.oneMonthTotal, total: viewModel.oneMonthTotal)
+                        ChartDataView(average: $viewModel.oneMonthTotal, total: $viewModel.oneMonthTotal)
                         
                         /// Bar chart visualisation for monthly step data
                         Chart {
-                            ForEach(viewModel.mockOneMonthData) { data in
+                            ForEach(viewModel.oneMonthChartData) { data in
                                 BarMark(x: .value(data.date.formatted(), data.date, unit: .day), y: .value("Steps", data.count))
                             }
                         }
@@ -55,11 +55,11 @@ struct ChartsView: View {
                 case .threeMonth:
                     VStack {
                         /// Displays average ad tital steps for three months
-                        ChartDataView(average: viewModel.threeMonthAverage, total: viewModel.threeMonthTotal)
+                        ChartDataView(average: $viewModel.threeMonthAverage, total: $viewModel.threeMonthTotal)
                         
                         Chart {
                             /// Barchart visualisation for three-month step data
-                            ForEach(viewModel.mockThreeMonthData) { data in
+                            ForEach(viewModel.threeMonthsChartData) { data in
                                 BarMark(x: .value(data.date.formatted(), data.date, unit: .day), y: .value("Steps", data.count))
                             }
                         }
@@ -67,7 +67,7 @@ struct ChartsView: View {
                 case .yearToDate:
                     VStack {
                         /// Displays average and total steps for the year-to-date period
-                        ChartDataView(average: viewModel.ytdAverage, total: viewModel.ytdTotal)
+                        ChartDataView(average: $viewModel.ytdAverage, total: $viewModel.ytdTotal)
                         
                         /// Bar chart visualisation for YTD step data
                         Chart {
@@ -79,7 +79,7 @@ struct ChartsView: View {
                 case .oneYear:
                     VStack {
                         /// Displays average and total steps for one year
-                        ChartDataView(average: viewModel.oneYearAverage, total: viewModel.oneYearTotal)
+                        ChartDataView(average: $viewModel.oneYearAverage, total: $viewModel.oneYearTotal)
                         
                         /// Bar chart visualisation for yearly step data
                         Chart {
@@ -109,6 +109,13 @@ struct ChartsView: View {
             }
             
         }
+        .alert("Oops!", isPresented: $viewModel.presentError, actions: {
+            Button("Ok", role: .cancel) {
+                // Optional: Do something here if needed when "Ok" is tapped
+            }
+        }, message: {
+            Text("We ran into issues fetching some of your step data. Please make sure you have allowed access and try again.")
+        })
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }

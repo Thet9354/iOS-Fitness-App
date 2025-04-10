@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct Workout {
-    let id: Int?
+struct Workout: Identifiable, Hashable {
+    let id = UUID()
     let title: String
     let image: String
     let tintColor: Color

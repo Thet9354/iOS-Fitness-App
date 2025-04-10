@@ -163,6 +163,11 @@ struct ProfileView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .alert("Oops", isPresented: $viewModel.showAlert) {
+            Button("Ok", role: .cancel) { }
+        } message: {
+            Text("We were unable to open your mall application. Plese make sure you have one installed.")
+        }
     }
 }
 

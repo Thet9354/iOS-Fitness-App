@@ -20,9 +20,25 @@ struct LeaderboardView: View {
     var body: some View {
         ZStack {
             VStack {
-                Text("Leaderboard")
-                    .font(.largeTitle)
-                    .bold()
+                ZStack(alignment: .trailing) {
+                    Text("Leaderboard")
+                        .font(.largeTitle)
+                        .bold()
+                        .frame(maxWidth: .infinity)
+                    
+                    Button {
+                        viewModel.setUpLeaderboardData()
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                            .resizable()
+                            .scaledToFit()
+                            .bold()
+                            .foregroundColor(Color(uiColor: .label))
+                            .frame(width: 28, height: 28)
+                            .padding(.trailing)
+                    }
+
+                }
                 
                 HStack {
                     Text("Name")
@@ -81,15 +97,15 @@ struct LeaderboardView: View {
                 TermsView(showTerms: $showTerms)
             }
         }
-        .onChange(of: showTerms) { _ in
-            if !showTerms && username != nil {
-                Task {
-                    do {
-                        try await viewModel.setUpLeaderboardData()
-                    } catch {
-                        print(error.localizedDescription)
-                    }
-                }
+        .frame(maxHeight: .infinity, alignment: .top)
+        .alert("Oops", isPresented: $viewModel.showAlert) {
+            Button("Ok", role: .cancel) { }
+        } message: {
+            Text("There was an issue fetching some of your data. Some health tracking requires an Apple Watch.")
+        }
+        .onChange(of: showTerms) { oldValue, newValue in
+            if !newValue && username != nil {
+                viewModel.setUpLeaderboardData()
             }
         }
     }

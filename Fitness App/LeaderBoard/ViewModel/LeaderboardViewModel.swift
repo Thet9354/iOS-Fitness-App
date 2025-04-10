@@ -12,12 +12,10 @@ import Foundation
 class LeaderboardViewModel: ObservableObject {
     
     // MARK: VARIABLES
-    
-    /// List of all leaderboard users fetched from Firestore
-    @Published var leaders = [LeaderboardUser]()
-    
+        
     /// Stores the leaderboard result containing the current user (if available) and the top 10 users.
     @Published var leaderResult = LeaderboardResult(user: nil, top10: [])
+    @Published var showAlert = false
     
     /// Mock leaderboard data used for testing the UI previews.
     var mockData = [
@@ -39,20 +37,24 @@ class LeaderboardViewModel: ObservableObject {
     
     /// Initializes the 'LeaderboardViewModel', automatically updating the leaderboard for a test user
     init () {
-        Task {
-            do {
-                try await setUpLeaderboardData()
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
+        setUpLeaderboardData()
     }
     
-    func setUpLeaderboardData() async throws {
-        try await postStepCountUpdateForUser()
-        let result = try await fetchLeaderboards()
-        DispatchQueue.main.async {
-            self.leaderResult = result
+    func setUpLeaderboardData() {
+        Task {
+            do {
+                try await postStepCountUpdateForUser()
+                let result = try await fetchLeaderboards()
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    self.leaderResult = result
+                }
+            } catch {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    self.showAlert = true
+                }
+            }
         }
     }
     
@@ -86,6 +88,10 @@ class LeaderboardViewModel: ObservableObject {
         }
     }
     
+    enum LeaderboardViewModelError: Error {
+        case unabaleToFetchUsername
+    }
+    
     
     // MARK: POST (UPDATE) STEP COUNT FOR USER
     
@@ -96,7 +102,7 @@ class LeaderboardViewModel: ObservableObject {
     ///  - Throws: An error if the Firestore write operation fails.
     private func postStepCountUpdateForUser() async throws {
         guard let username = UserDefaults.standard.string(forKey: "username") else {
-            throw URLError(.badURL)
+            throw LeaderboardViewModelError.unabaleToFetchUsername
         }
         let steps = try await fetchCurrentWeekStepCount()
         try await DatabaseManager.shared.postStepCountUpdateForUser(leader: LeaderboardUser(username: username, count: Int(steps)))

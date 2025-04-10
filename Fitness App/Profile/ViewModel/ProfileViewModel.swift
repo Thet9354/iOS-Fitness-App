@@ -18,6 +18,8 @@ class ProfileViewModel: ObservableObject {
     @Published var profileImage: String? = UserDefaults.standard.string(forKey: "profileImage")
     @Published var selectedImage: String? = UserDefaults.standard.string(forKey: "profileImage")
     
+    @Published var showAlert = false
+    
     var images = ["avatar 1", "avatar 2", "avatar 3", "avatar 4", "avatar 5", "avatar 6", "avatar 7", "avatar 8", "avatar 9", "avatars 10"]
     
     func presentEditName() {
@@ -65,7 +67,10 @@ class ProfileViewModel: ObservableObject {
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
         } else {
-            return
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.showAlert = true
+            } 
         }
         
         

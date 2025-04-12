@@ -35,7 +35,7 @@ struct WorkoutCardView: View {
                 }
                 
                 HStack {
-                    Text(workout.date)
+                    Text(workout.date.formatWorkoutDate())
                     
                     Spacer()
                     
@@ -48,5 +48,5 @@ struct WorkoutCardView: View {
 }
 
 #Preview {
-    WorkoutCardView(workout: Workout(title: "Running", image: "figure.run", tintColor: .cyan, duration: "51 mins", date: "Aug 1", calories: "512 kcal"))
+    WorkoutCardView(workout: Workout(title: "Running", image: "figure.run", tintColor: .cyan, duration: "51 mins", date: Date(), calories: "512 kcal"))
 }

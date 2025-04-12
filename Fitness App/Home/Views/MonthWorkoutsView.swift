@@ -7,24 +7,7 @@
 
 import SwiftUI
 
-class MonthWorkoutsViewModel: ObservableObject {
-    
-    @Published var selectedMonth = 0
-    @Published var selectedDate = Date()
-    
-    @Published var workouts = [Workout]()
-    @Published var currentMonthWorkouts = [
-        Workout(title: "Running", image: "figure.run", tintColor: .cyan, duration: "51 mins", date: "Aug 1", calories: "512 kcal"),
-        Workout(title: "Running", image: "figure.run", tintColor: .cyan, duration: "51 mins", date: "Aug 1", calories: "512 kcal"),
-        Workout(title: "Running", image: "figure.run", tintColor: .cyan, duration: "51 mins", date: "Aug 1", calories: "512 kcal"),
-        Workout(title: "Running", image: "figure.run", tintColor: .cyan, duration: "51 mins", date: "Aug 1", calories: "512 kcal")
-    ]
-    
-    func updateSelectedDate() {
-        self.selectedDate = Calendar.current.date(byAdding: .month, value: selectedMonth, to: Date()) ?? Date()
-    }
-    
-}
+
 
 struct MonthWorkoutsView: View {
     
@@ -78,9 +61,14 @@ struct MonthWorkoutsView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .padding()
+        .padding(.vertical)
         .onChange(of: viewModel.selectedMonth) { _ in
             viewModel.updateSelectedDate()
+        }
+        .alert("Oops", isPresented: $viewModel.showAlert) {
+            Button("Ok", role: .cancel) { }
+        } message: {
+            Text("Unable to load workouts for \(viewModel.selectedDate.monthAndYearFormat()). Please try again and make sure you have workouts for the selected month and try again")
         }
     }
 }
